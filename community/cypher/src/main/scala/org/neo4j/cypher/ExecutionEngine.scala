@@ -93,7 +93,7 @@ class ExecutionEngine(graph: GraphDatabaseService, logger: StringLogger = String
   private def getQueryCacheSize() : Int = if (graph.isInstanceOf[InternalAbstractGraphDatabase]) {
     val database = graph.asInstanceOf[InternalAbstractGraphDatabase]
     database.getConfig.get(GraphDatabaseSettings.query_cache_size) match {
-      case v:java.lang.Integer => v
+      case v:java.lang.Long => v.intValue()
       case _ => 100
     }
   } else {

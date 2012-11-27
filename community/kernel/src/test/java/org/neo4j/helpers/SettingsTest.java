@@ -38,6 +38,7 @@ import static org.neo4j.helpers.Settings.max;
 import static org.neo4j.helpers.Settings.min;
 import static org.neo4j.helpers.Settings.range;
 import static org.neo4j.helpers.Settings.setting;
+import static org.neo4j.helpers.SettingsTest.SettingsExamples.*;
 import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
 import java.io.File;
@@ -48,18 +49,23 @@ import org.neo4j.graphdb.config.Setting;
 
 public class SettingsTest
 {
+    public static final class SettingsExamples
+    {
+        public static final Setting<Integer> integerWithDefault = setting( "foo", INTEGER, "3" );
+        public static final Setting<List<Integer>> integerListWithDefault = setting( "foo", list( ",", INTEGER ), "1,2,3,4" );
+    }
+
     @Test
     public void testInteger()
     {
-        Setting<Integer> setting = setting( "foo", INTEGER, "3" );
 
         // Ok
-        assertThat( setting.apply( map( stringMap( "foo", "4" ) ) ), equalTo( 4 ) );
+        assertThat( integerWithDefault.apply( map( stringMap( "foo", "4" ) ) ), equalTo( 4 ) );
 
         // Bad
         try
         {
-            setting.apply( map( stringMap( "foo", "bar" ) ) );
+            integerWithDefault.apply( map( stringMap( "foo", "bar" ) ) );
             fail();
         }
         catch ( IllegalArgumentException e )
@@ -71,8 +77,7 @@ public class SettingsTest
     @Test
     public void testList()
     {
-        Setting<List<Integer>> setting = setting( "foo", list( ",", INTEGER ), "1,2,3,4" );
-        assertThat( setting.apply( map( stringMap() ) ).toString(), equalTo( "[1, 2, 3, 4]" ) );
+        assertThat( integerListWithDefault.apply( map( stringMap() ) ).toString(), equalTo( "[1, 2, 3, 4]" ) );
     }
 
     @Test

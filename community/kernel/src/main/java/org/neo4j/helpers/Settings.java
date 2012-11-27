@@ -20,6 +20,8 @@
 
 package org.neo4j.helpers;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -350,7 +352,7 @@ public final class Settings
             }
             catch ( NumberFormatException e )
             {
-                throw new IllegalArgumentException( String.format( "%s is not a valid size, must be e.g. 10, 5K, 1M, " +
+                throw new IllegalArgumentException( format( "%s is not a valid size, must be e.g. 10, 5K, 1M, " +
                         "11G", value ) );
             }
         }
@@ -487,6 +489,12 @@ public final class Settings
 
                 return value;
             }
+
+            @Override
+            public String toString()
+            {
+                return format( "matches the pattern '%s'", regex);
+            }
         };
     }
 
@@ -501,10 +509,16 @@ public final class Settings
                 {
                     if ( value.compareTo( min ) < 0 )
                     {
-                        throw new IllegalArgumentException( String.format( "minimum allowed value is: %s", min ) );
+                        throw new IllegalArgumentException( format( "minimum allowed value is: %s", min ) );
                     }
                 }
                 return value;
+            }
+
+            @Override
+            public String toString()
+            {
+                return "is minimum "+min;
             }
         };
     }
@@ -520,17 +534,36 @@ public final class Settings
                 {
                     if ( value.compareTo( max ) > 0 )
                     {
-                        throw new IllegalArgumentException( String.format( "maximum allowed value is: %s", max ) );
+                        throw new IllegalArgumentException( format( "maximum allowed value is: %s", max ) );
                     }
                 }
                 return value;
+            }
+
+            @Override
+            public String toString()
+            {
+                return "is maximum "+max;
             }
         };
     }
 
     public static <T extends Comparable<T>> Function2<T, Function<String, String>, T> range( final T min, final T max )
     {
-        return Functions.<T, Function<String, String>>compose2().apply( min( min ), max( max ) );
+        return new Function2<T, Function<String, String>, T>()
+        {
+            @Override
+            public T apply( T from1, Function<String, String> from2 )
+            {
+                return min(min).apply( max(max).apply( from1, from2 ), from2 );
+            }
+
+            @Override
+            public String toString()
+            {
+                return format("is in the range %s to %s", min, max);
+            }
+        };
     }
 
     public static Function2<Integer, Function<String, String>, Integer> port =
@@ -555,6 +588,12 @@ public final class Settings
                 {
                     throw new IllegalArgumentException( message );
                 }
+            }
+
+            @Override
+            public String toString()
+            {
+                return message;
             }
         };
     }
@@ -600,7 +639,7 @@ public final class Settings
             @Override
             public String toString()
             {
-                return "relative to '"+baseSetting.name()+"'";
+                return "is relative to '"+baseSetting.name()+"'";
             }
         };
     }
@@ -613,7 +652,7 @@ public final class Settings
                 {
                     if ( path.exists() && !path.isFile() )
                     {
-                        throw new IllegalArgumentException( String.format( "%s must point to a file, not a directory",
+                        throw new IllegalArgumentException( format( "%s must point to a file, not a directory",
                                 path.toString() ) );
                     }
 
@@ -629,7 +668,7 @@ public final class Settings
                 {
                     if ( path.exists() && !path.isDirectory() )
                     {
-                        throw new IllegalArgumentException( String.format( "%s must point to a file, not a directory",
+                        throw new IllegalArgumentException( format( "%s must point to a file, not a directory",
                                 path.toString() ) );
                     }
 
@@ -763,7 +802,7 @@ public final class Settings
                 }
                 catch ( Exception e )
                 {
-                    throw new IllegalArgumentException( String.format( "Missing mandatory setting '%s'", name() ) );
+                    throw new IllegalArgumentException( format( "Missing mandatory setting '%s'", name() ) );
                 }
             }
 
@@ -786,7 +825,8 @@ public final class Settings
             }
             catch ( IllegalArgumentException e )
             {
-                throw new IllegalArgumentException( String.format( "Bad value '%s' for setting '%s': %s", value, name(), e.getMessage() ) );
+                throw new IllegalArgumentException( format( "Bad value '%s' for setting '%s': %s", value, name(),
+                        e.getMessage() ) );
             }
 
 

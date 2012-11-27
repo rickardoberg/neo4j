@@ -79,7 +79,7 @@ public abstract class GraphDatabaseSettings
 
     @Description("The name of the Transaction Manager service to use as defined in the TM service provider " +
             "constructor, defaults to native.")
-    public static final StringSetting tx_manager_impl = new StringSetting( setting("tx_manager_impl", STRING, NO_DEFAULT, illegalValueMessage( "Must be class name of TransactionManager implementation", matches( ANY ))));
+    public static final StringSetting tx_manager_impl = new StringSetting( setting("tx_manager_impl", STRING, NO_DEFAULT, illegalValueMessage( "must be class name of a valid TransactionManager implementation", matches( ANY ))));
 
     @Description("Whether to allow a store upgrade in case the current version of the database starts against an " +
             "older store version. " +
@@ -98,7 +98,7 @@ public abstract class GraphDatabaseSettings
     public static final OptionsSetting cypher_parser_version = new CypherParserSetting(setting( "cypher_parser_version", Settings.options( CypherParserSetting.v1_7, CypherParserSetting.v1_8, CypherParserSetting.v1_9 ), NO_DEFAULT ));
 
     @Description("Used to set the number of Cypher query execution plans that are cached.")
-    public static GraphDatabaseSetting<Integer> query_cache_size = new IntegerSetting( setting("query_cache_size", INTEGER, "100", min( 0 ) ));
+    public static GraphDatabaseSetting<Long> query_cache_size = new GraphDatabaseSetting.LongSetting( setting("query_cache_size", BYTES, "100", min( 0L ) ));
 
     // Store files
     @Description("The directory where the database files are located.")
@@ -117,7 +117,7 @@ public abstract class GraphDatabaseSettings
     public static GraphDatabaseSetting<Boolean> remote_logging_enabled = new BooleanSetting(setting("remote_logging_enabled", BOOLEAN, FALSE ));
 
     @Description("Host for remote logging using LogBack SocketAppender.")
-    public static final StringSetting remote_logging_host = new StringSetting( setting("remote_logging_host", STRING, "127.0.0.1", illegalValueMessage( "Must be a valid hostname", matches( ANY ) ) ));
+    public static final StringSetting remote_logging_host = new StringSetting( setting("remote_logging_host", STRING, "127.0.0.1", illegalValueMessage( "must be a valid hostname", matches( ANY ) ) ));
 
     @Description("Port for remote logging using LogBack SocketAppender.")
     public static final PortSetting remote_logging_port = new PortSetting( setting("remote_logging_port", INTEGER, "4560", port ));
@@ -135,7 +135,7 @@ public abstract class GraphDatabaseSettings
 
     @Description("A list of property names (comma separated) that will be indexed by default. This applies to Nodes " +
             "only.")
-    public static final StringSetting node_keys_indexable = new StringSetting( setting("node_keys_indexable", STRING, NO_DEFAULT, illegalValueMessage( "Must be a comma-separated list of keys to be indexed", matches( ANY ) ) ));
+    public static final StringSetting node_keys_indexable = new StringSetting( setting("node_keys_indexable", STRING, NO_DEFAULT, illegalValueMessage( "must be a comma-separated list of keys to be indexed", matches( ANY ) ) ));
 
     @Description("Controls the auto indexing feature for relationships. Setting to false shuts it down, " +
             "while true enables it by default for properties "
@@ -144,7 +144,7 @@ public abstract class GraphDatabaseSettings
 
     @Description(" A list of property names (comma separated) that will be indexed by default. This applies to " +
             "Relationships only.")
-    public static final StringSetting relationship_keys_indexable = new StringSetting( setting("relationship_keys_indexable", STRING, NO_DEFAULT, illegalValueMessage( "Must be a comma-separated list of keys to be indexed", matches( ANY ) ) ));
+    public static final StringSetting relationship_keys_indexable = new StringSetting( setting("relationship_keys_indexable", STRING, NO_DEFAULT, illegalValueMessage( "must be a comma-separated list of keys to be indexed", matches( ANY ) ) ));
 
     // Lucene settings
     @Description("Integer value that sets the maximum number of open lucene index searchers.")
@@ -165,7 +165,7 @@ public abstract class GraphDatabaseSettings
             "Can be used for specifying the threshold to prune logical logs after. For example \"10 days\" will " +
             "prune logical logs that only contains transactions older than 10 days from the current time, " +
             "or \"100k txs\" will keep the 100k latest transactions and prune any older transactions.")
-    public static final StringSetting keep_logical_logs = new StringSetting( setting("keep_logical_logs", STRING, TRUE, illegalValueMessage( "Must be 'true'/'false' or of format '<number><optional unit> <type>' for example '100M size' for " +
+    public static final StringSetting keep_logical_logs = new StringSetting( setting("keep_logical_logs", STRING, TRUE, illegalValueMessage( "must be 'true'/'false' or of format '<number><optional unit> <type>' for example '100M size' for " +
                         "limiting logical log space on disk to 100Mb," +
                         " or '200k txs' for limiting the number of transactions to keep to 200 000.", matches(ANY))));
 
