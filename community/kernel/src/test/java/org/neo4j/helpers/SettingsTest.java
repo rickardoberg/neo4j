@@ -38,7 +38,6 @@ import static org.neo4j.helpers.Settings.max;
 import static org.neo4j.helpers.Settings.min;
 import static org.neo4j.helpers.Settings.range;
 import static org.neo4j.helpers.Settings.setting;
-import static org.neo4j.helpers.SettingsTest.SettingsExamples.*;
 import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
 import java.io.File;
@@ -46,26 +45,23 @@ import java.util.List;
 
 import org.junit.Test;
 import org.neo4j.graphdb.config.Setting;
+import org.neo4j.graphdb.factory.Description;
 
 public class SettingsTest
 {
-    public static final class SettingsExamples
-    {
-        public static final Setting<Integer> integerWithDefault = setting( "foo", INTEGER, "3" );
-        public static final Setting<List<Integer>> integerListWithDefault = setting( "foo", list( ",", INTEGER ), "1,2,3,4" );
-    }
-
+    @Description("Integer with default")
+    public static final Setting<Integer> integerWithDefault = setting( "integerWithDefault", INTEGER, "3" );
     @Test
     public void testInteger()
     {
-
         // Ok
-        assertThat( integerWithDefault.apply( map( stringMap( "foo", "4" ) ) ), equalTo( 4 ) );
+        assertThat( integerWithDefault.apply( map( stringMap( "integerWithDefault", "4" ) ) ), equalTo( 4 ) );
+        assertThat( integerWithDefault.apply( map( stringMap() ) ), equalTo( 3 ) );
 
         // Bad
         try
         {
-            integerWithDefault.apply( map( stringMap( "foo", "bar" ) ) );
+            integerWithDefault.apply( map( stringMap( "integerWithDefault", "bar" ) ) );
             fail();
         }
         catch ( IllegalArgumentException e )
@@ -74,24 +70,26 @@ public class SettingsTest
         }
     }
 
+    @Description("Integer list with default")
+    public static final Setting<List<Integer>> integerListWithDefault = setting( "integerListWithDefault", list( ",", INTEGER ), "1,2,3,4" );
     @Test
     public void testList()
     {
         assertThat( integerListWithDefault.apply( map( stringMap() ) ).toString(), equalTo( "[1, 2, 3, 4]" ) );
     }
 
+    @Description("Integer with default and min")
+    public static final Setting<Integer> integerWithDefaultAndMin = setting( "integerListWithDefault", INTEGER, "3", min( 2 ) );
     @Test
     public void testMin()
     {
-        Setting<Integer> setting = setting( "foo", INTEGER, "3", min( 2 ) );
-
         // Ok
-        assertThat( setting.apply( map( stringMap( "foo", "4" ) ) ), equalTo( 4 ) );
+        assertThat( integerWithDefaultAndMin.apply( map( stringMap( "integerListWithDefault", "4" ) ) ), equalTo( 4 ) );
 
         // Bad
         try
         {
-            setting.apply( map( stringMap( "foo", "1" ) ) );
+            integerWithDefaultAndMin.apply( map( stringMap( "integerListWithDefault", "1" ) ) );
             fail();
         }
         catch ( IllegalArgumentException e )
@@ -101,18 +99,18 @@ public class SettingsTest
 
     }
 
+    @Description("Integer with default and max")
+    public static final Setting<Integer> integerWithDefaultAndMax = setting( "integerWithDefaultAndMax", INTEGER, "3", max( 5 ) );
     @Test
     public void testMax()
     {
-        Setting<Integer> setting = setting( "foo", INTEGER, "3", max( 5 ) );
-
         // Ok
-        assertThat( setting.apply( map( stringMap( "foo", "4" ) ) ), equalTo( 4 ) );
+        assertThat( integerWithDefaultAndMax.apply( map( stringMap( "integerWithDefaultAndMax", "4" ) ) ), equalTo( 4 ) );
 
         // Bad
         try
         {
-            setting.apply( map( stringMap( "foo", "7" ) ) );
+            integerWithDefaultAndMax.apply( map( stringMap( "integerWithDefaultAndMax", "7" ) ) );
             fail();
         }
         catch ( IllegalArgumentException e )
@@ -121,18 +119,18 @@ public class SettingsTest
         }
     }
 
+    @Description("Integer with default and range")
+    public static final Setting<Integer> integerWithDefaultAndRange = setting( "integerWithDefaultAndRange", INTEGER, "3", range( 2, 5 ) );
     @Test
     public void testRange()
     {
-        Setting<Integer> setting = setting( "foo", INTEGER, "3", range( 2, 5 ) );
-
         // Ok
-        assertThat( setting.apply( map( stringMap( "foo", "4" ) ) ), equalTo( 4 ) );
+        assertThat( integerWithDefaultAndRange.apply( map( stringMap( "integerWithDefaultAndRange", "4" ) ) ), equalTo( 4 ) );
 
         // Bad
         try
         {
-            setting.apply( map( stringMap( "foo", "1" ) ) );
+            integerWithDefaultAndRange.apply( map( stringMap( "integerWithDefaultAndRange", "1" ) ) );
             fail();
         }
         catch ( IllegalArgumentException e )
@@ -142,7 +140,7 @@ public class SettingsTest
 
         try
         {
-            setting.apply( map( stringMap( "foo", "6" ) ) );
+            integerWithDefaultAndRange.apply( map( stringMap( "integerWithDefaultAndRange", "6" ) ) );
             fail();
         }
         catch ( IllegalArgumentException e )
@@ -151,18 +149,18 @@ public class SettingsTest
         }
     }
 
+    @Description("String with default and matches")
+    public static final Setting<String> stringWithDefaultAndMatches = setting( "stringWithDefaultAndMatches", STRING, "abc", matches( "a*b*c*" ) );
     @Test
     public void testMatches()
     {
-        Setting<String> setting = setting( "foo", STRING, "abc", matches( "a*b*c*" ) );
-
         // Ok
-        assertThat( setting.apply( map( stringMap( "foo", "aaabbbccc" ) ) ), equalTo( "aaabbbccc" ) );
+        assertThat( stringWithDefaultAndMatches.apply( map( stringMap( "stringWithDefaultAndMatches", "aaabbbccc" ) ) ), equalTo( "aaabbbccc" ) );
 
         // Bad
         try
         {
-            setting.apply( map( stringMap( "foo", "cba" ) ) );
+            stringWithDefaultAndMatches.apply( map( stringMap( "stringWithDefaultAndMatches", "cba" ) ) );
             fail();
         }
         catch ( IllegalArgumentException e )
@@ -171,46 +169,25 @@ public class SettingsTest
         }
     }
 
+    @Description("Integer with broken default and min")
+    public static final Setting<Long> durationWithBrokenDefaultAndMin = setting( "durationWithBrokenDefaultAndMin", DURATION, "1s", min( DURATION.apply( "3s" ) ) );
     @Test( expected = IllegalArgumentException.class )
     public void testDurationWithBrokenDefault()
     {
         // Notice that the default value is less that the minimum
-        Setting<Long> setting = setting( "foo.bar", DURATION, "1s", min( DURATION.apply( "3s" ) ) );
+        Setting<Long> setting = durationWithBrokenDefaultAndMin;
         setting.apply( map( stringMap() ) );
     }
 
+    public static final Setting<Long> durationWithDefaultAndMin = setting( "durationWithDefaultAndMin", DURATION, "3s", min( DURATION.apply( "3s" ) ) );
     @Test( expected = IllegalArgumentException.class )
     public void testDurationWithValueNotWithinConstraint()
     {
-        Setting<Long> setting = setting( "foo.bar", DURATION, "3s", min( DURATION.apply( "3s" ) ) );
-        setting.apply( map( stringMap( "foo.bar", "2s" ) ) );
-    }
+        assertThat( durationWithDefaultAndMin.apply( map( stringMap( "durationWithDefaultAndMin", "4s" ) ) ), equalTo( 4000L ) );
 
-    @Test
-    public void testDuration()
-    {
-        Setting<Long> setting = setting( "foo.bar", DURATION, "3s", min( DURATION.apply( "3s" ) ) );
-        assertThat( setting.apply( map( stringMap( "foo.bar", "4s" ) ) ), equalTo( 4000L ) );
-    }
-
-    @Test
-    public void testDefault()
-    {
-        Setting<Integer> setting = setting( "foo", INTEGER, "3" );
-
-        // Ok
-        assertThat( setting.apply( map( stringMap() ) ), equalTo( 3 ) );
-    }
-
-    @Test
-    public void testMandatory()
-    {
-        Setting<Integer> setting = setting( "foo", INTEGER, MANDATORY );
-
-        // Check that missing mandatory setting throws exception
         try
         {
-            setting.apply( map( stringMap() ) );
+            durationWithDefaultAndMin.apply( map( stringMap( "durationWithDefaultAndMin", "2s" ) ) );
             fail();
         }
         catch ( Exception e )
@@ -219,12 +196,29 @@ public class SettingsTest
         }
     }
 
+    public static Setting<Integer> integerIsMandatory = setting( "integerIsMandatory", INTEGER, MANDATORY );
+    @Test
+    public void testMandatory()
+    {
+        // Check that missing mandatory setting throws exception
+        try
+        {
+            integerIsMandatory.apply( map( stringMap() ) );
+            fail();
+        }
+        catch ( Exception e )
+        {
+            // Ok
+        }
+    }
+
+    public static Setting<File> pathBase = setting( "pathBase", PATH, "." );
+    public static Setting<File> pathWithBasePathIsFile = setting( "pathWithBasePathIsFile", PATH, "config.properties", basePath( pathBase ), isFile );
+
     @Test
     public void testPaths()
     {
-        Setting<File> home = setting( "home", PATH, "." );
-        Setting<File> config = setting( "config", PATH, "config.properties", basePath( home ), isFile );
-        assertThat( config.apply( map( stringMap() ) ).getAbsolutePath(),
+        assertThat( pathWithBasePathIsFile.apply( map( stringMap() ) ).getAbsolutePath(),
             equalTo( new File( ".", "config.properties" ).getAbsolutePath() ) );
     }
 
