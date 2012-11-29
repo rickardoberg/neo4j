@@ -57,26 +57,11 @@ public class GenerateDefaultNeo4jProperties
                     String name = property.substring( 0, property.lastIndexOf( "." ) );
                     System.out.println( "# "+bundle.getString( property ) );
 
-                    // Output optional options
-                    String optionsKey = name+".options";
-                    if (bundle.containsKey( optionsKey ))
+                    // Output validation message
+                    String validationMessage = name+".validationmessage";
+                    if (bundle.containsKey( validationMessage ))
                     {
-                        String[] options = bundle.getString( optionsKey ).split( "," );
-                        if (bundle.containsKey( name+".option."+options[0] ))
-                        {
-                            System.out.println("# Valid settings:");
-                            for( String option : options )
-                            {
-                                String description = bundle.getString( name + ".option." + option );
-                                char[] spaces = new char[ option.length() + 3 ];
-                                Arrays.fill( spaces,' ' );
-                                description = description.replace( "\n", "\n#"+ new String( spaces ) );
-                                System.out.println("# "+option+": "+ description );
-                            }
-                        } else
-                        {
-                            System.out.println("# Valid settings:"+bundle.getString( optionsKey ));
-                        }
+                        System.out.println("# "+bundle.getString( validationMessage ));
                     }
 
                     String defaultKey = name + ".default";
