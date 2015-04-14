@@ -22,7 +22,7 @@ package org.neo4j.graphdb.factory;
 import java.util.Map;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
+import org.neo4j.kernel.ha.factory.EnterpriseFacadeFactory;
 
 /**
  * Factory for HA Neo4j instances.
@@ -41,7 +41,7 @@ public class HighlyAvailableGraphDatabaseFactory extends GraphDatabaseFactory
             {
                 config.put( "ephemeral", "false" );
 
-                return new HighlyAvailableGraphDatabase( path, config, state.databaseDependencies() );
+                return new EnterpriseFacadeFactory().newFacade( config, state.databaseDependencies() );
             }
         };
     }

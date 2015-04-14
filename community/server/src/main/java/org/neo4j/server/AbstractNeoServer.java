@@ -19,8 +19,6 @@
  */
 package org.neo4j.server;
 
-import org.apache.commons.configuration.Configuration;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -29,8 +27,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.Filter;
+
+import org.apache.commons.configuration.Configuration;
 
 import org.neo4j.function.Supplier;
 import org.neo4j.graphdb.DependencyResolver;
@@ -39,7 +38,7 @@ import org.neo4j.helpers.Clock;
 import org.neo4j.helpers.Function;
 import org.neo4j.helpers.RunCarefully;
 import org.neo4j.helpers.Settings;
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.guard.Guard;
 import org.neo4j.kernel.impl.query.QueryExecutionEngine;
@@ -117,7 +116,7 @@ public abstract class AbstractNeoServer implements NeoServer
      */
     private static final long ROUNDING_SECOND = 1000L;
 
-    protected final InternalAbstractGraphDatabase.Dependencies dependencies;
+    protected final GraphDatabaseFacadeFactory.Dependencies dependencies;
     protected Database database;
     protected CypherExecutor cypherExecutor;
     protected ConfigurationBuilder configurator;
@@ -152,12 +151,12 @@ public abstract class AbstractNeoServer implements NeoServer
      * Should use the new constructor with {@link ConfigurationBuilder}
      */
     @Deprecated
-    public AbstractNeoServer( Configurator configurator, Database.Factory dbFactory, InternalAbstractGraphDatabase.Dependencies dependencies )
+    public AbstractNeoServer( Configurator configurator, Database.Factory dbFactory, GraphDatabaseFacadeFactory.Dependencies dependencies )
     {
         this( new ConfiguratorWrappingConfigurationBuilder( configurator ), dbFactory, dependencies );
     }
 
-    public AbstractNeoServer( ConfigurationBuilder configurator, Database.Factory dbFactory, InternalAbstractGraphDatabase.Dependencies dependencies )
+    public AbstractNeoServer( ConfigurationBuilder configurator, Database.Factory dbFactory, GraphDatabaseFacadeFactory.Dependencies dependencies )
     {
         this.configurator = configurator;
         this.dependencies = dependencies;

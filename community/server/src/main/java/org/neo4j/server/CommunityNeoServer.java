@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory;
 import org.neo4j.kernel.impl.storemigration.StoreUpgrader;
 import org.neo4j.kernel.logging.Logging;
 import org.neo4j.server.configuration.ConfigurationBuilder;
@@ -63,7 +63,7 @@ public class CommunityNeoServer extends AbstractNeoServer
      * Should use the new constructor with {@link ConfigurationBuilder}
      */
     @Deprecated
-    public CommunityNeoServer( Configurator configurator, InternalAbstractGraphDatabase.Dependencies dependencies )
+    public CommunityNeoServer( Configurator configurator, GraphDatabaseFacadeFactory.Dependencies dependencies )
     {
         this( configurator, lifecycleManagingDatabase( EMBEDDED ), dependencies );
     }
@@ -72,17 +72,17 @@ public class CommunityNeoServer extends AbstractNeoServer
      * Should use the new constructor with {@link ConfigurationBuilder}
      */
     @Deprecated
-    public CommunityNeoServer( Configurator configurator, Database.Factory dbFactory, InternalAbstractGraphDatabase.Dependencies dependencies)
+    public CommunityNeoServer( Configurator configurator, Database.Factory dbFactory, GraphDatabaseFacadeFactory.Dependencies dependencies)
     {
         super( configurator, dbFactory, dependencies );
     }
 
-    public CommunityNeoServer( ConfigurationBuilder configurator, InternalAbstractGraphDatabase.Dependencies dependencies )
+    public CommunityNeoServer( ConfigurationBuilder configurator, GraphDatabaseFacadeFactory.Dependencies dependencies )
     {
         this( configurator, lifecycleManagingDatabase( EMBEDDED ), dependencies );
     }
 
-    public CommunityNeoServer( ConfigurationBuilder configurator, Database.Factory dbFactory, InternalAbstractGraphDatabase.Dependencies dependencies)
+    public CommunityNeoServer( ConfigurationBuilder configurator, Database.Factory dbFactory, GraphDatabaseFacadeFactory.Dependencies dependencies)
     {
         super( configurator, dbFactory, dependencies );
     }

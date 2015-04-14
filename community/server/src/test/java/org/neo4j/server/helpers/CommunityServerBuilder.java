@@ -32,10 +32,10 @@ import java.util.Properties;
 import org.neo4j.helpers.Clock;
 import org.neo4j.helpers.FakeClock;
 import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.kernel.impl.factory.CommunityFacadeFactory;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.GraphDatabaseDependencies;
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
-import org.neo4j.kernel.InternalAbstractGraphDatabase.Dependencies;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory;
 import org.neo4j.kernel.logging.BufferingConsoleLogger;
 import org.neo4j.kernel.logging.ConsoleLogger;
 import org.neo4j.kernel.logging.DevNullLoggingService;
@@ -58,6 +58,7 @@ import org.neo4j.test.ImpermanentGraphDatabase;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+
 import static org.neo4j.helpers.Clock.SYSTEM_CLOCK;
 import static org.neo4j.server.ServerTestUtils.asOneLine;
 import static org.neo4j.server.ServerTestUtils.createTempPropertyFile;
@@ -82,10 +83,10 @@ public class CommunityServerBuilder
     public static LifecycleManagingDatabase.GraphFactory IN_MEMORY_DB = new LifecycleManagingDatabase.GraphFactory()
     {
         @Override
-        public GraphDatabaseAPI newGraphDatabase( String storeDir, Map<String, String> params, Dependencies dependencies )
+        public GraphDatabaseAPI newGraphDatabase( String storeDir, Map<String, String> params, GraphDatabaseFacadeFactory.Dependencies dependencies )
         {
-            params.put( InternalAbstractGraphDatabase.Configuration.ephemeral.name(), "true" );
-            return new ImpermanentGraphDatabase( storeDir, params, dependencies );
+            params.put( CommunityFacadeFactory.Configuration.ephemeral.name(), "true" );
+            return new ImpermanentGraphDatabase( storeDir, params, GraphDatabaseDependencies.newDependencies(dependencies) );
         }
     };
 
@@ -132,7 +133,7 @@ public class CommunityServerBuilder
         return build( configFile, configurator, GraphDatabaseDependencies.newDependencies().logging(logging).monitors(monitors) );
     }
 
-    protected CommunityNeoServer build( File configFile, ConfigurationBuilder configurator, Dependencies dependencies )
+    protected CommunityNeoServer build( File configFile, ConfigurationBuilder configurator, GraphDatabaseFacadeFactory.Dependencies dependencies )
     {
         return new TestCommunityNeoServer( configurator, configFile, dependencies );
     }
@@ -489,7 +490,7 @@ public class CommunityServerBuilder
     {
         private final File configFile;
 
-        private TestCommunityNeoServer( ConfigurationBuilder propertyFileConfigurator, File configFile, Dependencies dependencies )
+        private TestCommunityNeoServer( ConfigurationBuilder propertyFileConfigurator, File configFile, GraphDatabaseFacadeFactory.Dependencies dependencies )
         {
             super( propertyFileConfigurator, lifecycleManagingDatabase( persistent ? EMBEDDED : IN_MEMORY_DB ), dependencies );
             this.configFile = configFile;

@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.neo4j.graphdb.factory.GraphDatabaseFactoryState;
 import org.neo4j.graphdb.mockfs.EphemeralFileSystemAbstraction;
 import org.neo4j.helpers.Service;
 import org.neo4j.helpers.collection.Iterables;
@@ -38,6 +37,7 @@ import org.neo4j.kernel.logging.SingleLoggingService;
 
 import static org.neo4j.graphdb.factory.GraphDatabaseSettings.pagecache_memory;
 import static org.neo4j.helpers.Settings.TRUE;
+import static org.neo4j.kernel.GraphDatabaseDependencies.newDependencies;
 import static org.neo4j.kernel.InternalAbstractGraphDatabase.Configuration.ephemeral;
 import static org.neo4j.test.GraphDatabaseServiceCleaner.cleanDatabaseContent;
 
@@ -120,9 +120,7 @@ public class ImpermanentGraphDatabase extends EmbeddedGraphDatabase
 
     private static Dependencies getDependencies( Iterable<KernelExtensionFactory<?>> kernelExtensions )
     {
-        GraphDatabaseFactoryState state = new GraphDatabaseFactoryState();
-        state.setKernelExtensions( kernelExtensions );
-        return state.databaseDependencies();
+        return newDependencies().kernelExtensions( kernelExtensions );
     }
 
     public ImpermanentGraphDatabase( String storeDir, Map<String, String> params, Dependencies dependencies )

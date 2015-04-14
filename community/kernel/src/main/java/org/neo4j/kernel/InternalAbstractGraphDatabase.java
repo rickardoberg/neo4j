@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.neo4j.collection.primitive.PrimitiveLongCollections.PrimitiveLongBaseIterator;
 import org.neo4j.collection.primitive.PrimitiveLongIterator;
+import org.neo4j.function.Supplier;
 import org.neo4j.function.primitive.FunctionFromPrimitiveLong;
 import org.neo4j.graphdb.ConstraintViolationException;
 import org.neo4j.graphdb.DependencyResolver;
@@ -137,7 +138,6 @@ import org.neo4j.kernel.impl.storemigration.StoreVersionCheck;
 import org.neo4j.kernel.impl.storemigration.UpgradableDatabase;
 import org.neo4j.kernel.impl.storemigration.UpgradeConfiguration;
 import org.neo4j.kernel.impl.storemigration.monitoring.VisibleMigrationProgressMonitor;
-import org.neo4j.kernel.impl.transaction.RecoveryVerifier;
 import org.neo4j.kernel.impl.transaction.TransactionCounters;
 import org.neo4j.kernel.impl.transaction.TransactionHeaderInformationFactory;
 import org.neo4j.kernel.impl.transaction.TransactionMonitor;
@@ -262,7 +262,6 @@ public abstract class InternalAbstractGraphDatabase
     protected StoreFactory storeFactory;
     protected DiagnosticsManager diagnosticsManager;
     protected NeoStoreDataSource neoDataSource;
-    protected RecoveryVerifier recoveryVerifier;
     protected Guard guard;
     protected NodeAutoIndexerImpl nodeAutoIndexer;
     protected RelationshipAutoIndexerImpl relAutoIndexer;
@@ -377,7 +376,6 @@ public abstract class InternalAbstractGraphDatabase
     protected void doAfterRecoveryAndStartup( boolean isMaster )
     {
         storeId = neoDataSource.getStoreId();
-        KernelDiagnostics.register( diagnosticsManager, InternalAbstractGraphDatabase.this, neoDataSource );
         if ( isMaster )
         {
             new RemoveOrphanConstraintIndexesOnStartup( neoDataSource.getKernel(), logging ).perform();
@@ -389,7 +387,14 @@ public abstract class InternalAbstractGraphDatabase
         this.kernelExtensions = new KernelExtensions(
                 dependencies.kernelExtensions(),
                 config,
-                getDependencyResolver(),
+                new org.neo4j.kernel.impl.util.Dependencies( new Supplier<DependencyResolver>()
+                {
+                    @Override
+                    public DependencyResolver get()
+                    {
+                        return getDependencyResolver();
+                    }
+                } ),
                 fail() );
 
         availabilityGuard = new AvailabilityGuard( Clock.SYSTEM_CLOCK );
@@ -497,8 +502,6 @@ public abstract class InternalAbstractGraphDatabase
         relAutoIndexer = life.add( new RelationshipAutoIndexerImpl( config, indexProvider, nodeManager ) );
         indexManager = new IndexManagerImpl(
                 threadToTransactionBridge, indexProvider, nodeAutoIndexer, relAutoIndexer );
-
-        recoveryVerifier = createRecoveryVerifier();
 
         // Factories for things that needs to be created later
         storeFactory = createStoreFactory();
@@ -617,11 +620,7 @@ public abstract class InternalAbstractGraphDatabase
         NodeActions nodeActions = createNodeActions();
         RelationshipActions relationshipActions = createRelationshipActions();
         GraphPropertiesActions graphPropertiesActions = createGraphPropertiesActions();
-        return new NodeManager(
-                nodeActions,
-                relationshipActions,
-                graphPropertiesActions,
-                threadToTransactionBridge );
+        return new NodeManager(this, threadToTransactionBridge, relationshipTypeTokenHolder );
     }
 
     @Override
@@ -664,11 +663,6 @@ public abstract class InternalAbstractGraphDatabase
             pageCacheFactory.dumpConfiguration( logging.getMessagesLog( PageCache.class ) );
         }
         return pageCache;
-    }
-
-    protected RecoveryVerifier createRecoveryVerifier()
-    {
-        return RecoveryVerifier.ALWAYS_VALID;
     }
 
     protected KernelData createKernelData()

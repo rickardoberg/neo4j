@@ -48,7 +48,7 @@ import org.neo4j.helpers.Function;
 import org.neo4j.helpers.Pair;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.helpers.collection.MapUtil;
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
+import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.server.database.Database;
 import org.neo4j.server.database.WrappedDatabase;
 import org.neo4j.server.helpers.ServerHelper;
@@ -92,13 +92,13 @@ public class DatabaseActionsTest
     private static final Label LABEL = DynamicLabel.label( "Label" );
     private static GraphDbHelper graphdbHelper;
     private static Database database;
-    private static InternalAbstractGraphDatabase graph;
+    private static GraphDatabaseAPI graph;
     private static DatabaseActions actions;
 
     @BeforeClass
     public static void createDb() throws IOException
     {
-        graph = (InternalAbstractGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
+        graph = (GraphDatabaseAPI) new TestGraphDatabaseFactory().newImpermanentDatabase();
         database = new WrappedDatabase( graph );
         graphdbHelper = new GraphDbHelper( database );
         actions = new TransactionWrappedDatabaseActions( new LeaseManager( new FakeClock() ), database.getGraph() );

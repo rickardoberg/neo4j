@@ -32,7 +32,7 @@ import org.neo4j.cluster.protocol.election.NotElectableElectionCredentialsProvid
 import org.neo4j.function.Predicates;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.helpers.Args;
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
+import org.neo4j.kernel.impl.factory.CommunityFacadeFactory;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.lifecycle.LifeSupport;
 import org.neo4j.kernel.lifecycle.LifecycleException;
@@ -172,7 +172,7 @@ public class StandaloneClusterClient
         File home = new File( System.getProperty( "neo4j.home" ) );
         String logDir = System.getProperty( "org.neo4j.cluster.logdirectory",
                 new File( new File( new File( home, "data" ), "log" ), "arbiter" ).getPath() );
-        Config config = new Config( stringMap( InternalAbstractGraphDatabase.Configuration.store_dir.name(), logDir ) );
+        Config config = new Config( stringMap( CommunityFacadeFactory.Configuration.store_dir.name(), logDir ) );
 
         return LogbackWeakDependency.tryLoadLogbackService( config, DEFAULT_TO_CLASSIC, new Monitors() );
     }

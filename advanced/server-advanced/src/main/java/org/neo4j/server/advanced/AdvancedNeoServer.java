@@ -22,7 +22,7 @@ package org.neo4j.server.advanced;
 import java.util.Arrays;
 
 import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
+import org.neo4j.kernel.impl.factory.CommunityFacadeFactory;
 import org.neo4j.server.CommunityNeoServer;
 import org.neo4j.server.advanced.modules.JMXManagementModule;
 import org.neo4j.server.configuration.ConfigurationBuilder;
@@ -31,12 +31,12 @@ import org.neo4j.server.modules.ServerModule;
 
 public class AdvancedNeoServer extends CommunityNeoServer
 {
-    public AdvancedNeoServer( ConfigurationBuilder configurator, Database.Factory dbFactory, InternalAbstractGraphDatabase.Dependencies dependencies)
+    public AdvancedNeoServer( ConfigurationBuilder configurator, Database.Factory dbFactory, CommunityFacadeFactory.Dependencies dependencies)
     {
         super(configurator, dbFactory, dependencies);
     }
 
-	public AdvancedNeoServer( ConfigurationBuilder configurator, InternalAbstractGraphDatabase.Dependencies dependencies)
+	public AdvancedNeoServer( ConfigurationBuilder configurator, CommunityFacadeFactory.Dependencies dependencies)
     {
         super( configurator, dependencies );
     }

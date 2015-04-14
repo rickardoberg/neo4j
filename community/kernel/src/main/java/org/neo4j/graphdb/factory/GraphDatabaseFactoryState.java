@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.neo4j.helpers.Service;
-import org.neo4j.kernel.InternalAbstractGraphDatabase.Dependencies;
+import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory;
 import org.neo4j.kernel.extension.KernelExtensionFactory;
+import org.neo4j.kernel.impl.query.QueryEngineProvider;
 import org.neo4j.kernel.logging.Logging;
 import org.neo4j.kernel.monitoring.Monitors;
-
-import static org.neo4j.kernel.GraphDatabaseDependencies.newDependencies;
 
 public class GraphDatabaseFactoryState
 {
@@ -85,12 +85,39 @@ public class GraphDatabaseFactoryState
         this.monitors = monitors;
     }
 
-    public Dependencies databaseDependencies()
+    public GraphDatabaseFacadeFactory.Dependencies databaseDependencies()
     {
-        return newDependencies().
-                monitors(monitors).
-                logging(logging).
-                settingsClasses(settingsClasses).
-                kernelExtensions(kernelExtensions);
+        return new GraphDatabaseFacadeFactory.Dependencies()
+        {
+            @Override
+            public Monitors monitors()
+            {
+                return monitors;
+            }
+
+            @Override
+            public Logging logging()
+            {
+                return logging;
+            }
+
+            @Override
+            public Iterable<Class<?>> settingsClasses()
+            {
+                return settingsClasses;
+            }
+
+            @Override
+            public Iterable<KernelExtensionFactory<?>> kernelExtensions()
+            {
+                return kernelExtensions;
+            }
+
+            @Override
+            public Iterable<QueryEngineProvider> executionEngines()
+            {
+                return Iterables.toList( Service.load( QueryEngineProvider.class ) );
+            }
+        };
     }
 }

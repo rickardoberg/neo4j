@@ -19,12 +19,10 @@
  */
 package org.neo4j.server.enterprise.helpers;
 
-import static org.neo4j.server.helpers.LoggingFactory.IMPERMANENT_LOGGING;
-
 import java.io.File;
 import java.io.IOException;
 
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory;
 import org.neo4j.server.CommunityNeoServer;
 import org.neo4j.server.configuration.ConfigurationBuilder;
 import org.neo4j.server.enterprise.EnterpriseNeoServer;
@@ -32,6 +30,8 @@ import org.neo4j.server.helpers.CommunityServerBuilder;
 import org.neo4j.server.helpers.LoggingFactory;
 import org.neo4j.server.preflight.PreFlightTasks;
 import org.neo4j.server.rest.web.DatabaseActions;
+
+import static org.neo4j.server.helpers.LoggingFactory.IMPERMANENT_LOGGING;
 
 public class EnterpriseServerBuilder extends CommunityServerBuilder
 {
@@ -64,7 +64,7 @@ public class EnterpriseServerBuilder extends CommunityServerBuilder
     }
 
     @Override
-    protected CommunityNeoServer build(File configFile, ConfigurationBuilder configurator, InternalAbstractGraphDatabase.Dependencies dependencies)
+    protected CommunityNeoServer build(File configFile, ConfigurationBuilder configurator, GraphDatabaseFacadeFactory.Dependencies dependencies)
     {
         return new TestEnterpriseNeoServer( configurator, configFile, dependencies );
     }
@@ -73,7 +73,7 @@ public class EnterpriseServerBuilder extends CommunityServerBuilder
     {
         private final File configFile;
 
-        public TestEnterpriseNeoServer( ConfigurationBuilder propertyFileConfigurator, File configFile, InternalAbstractGraphDatabase.Dependencies dependencies )
+        public TestEnterpriseNeoServer( ConfigurationBuilder propertyFileConfigurator, File configFile, GraphDatabaseFacadeFactory.Dependencies dependencies )
         {
             super( propertyFileConfigurator, dependencies );
             this.configFile = configFile;

@@ -26,14 +26,21 @@ import java.util.List;
 import org.neo4j.helpers.Service;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.kernel.extension.KernelExtensionFactory;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory;
 import org.neo4j.kernel.impl.query.QueryEngineProvider;
 import org.neo4j.kernel.logging.Logging;
 import org.neo4j.kernel.monitoring.Monitors;
 
 import static org.neo4j.helpers.collection.Iterables.addAll;
 
-public class GraphDatabaseDependencies implements InternalAbstractGraphDatabase.Dependencies
+public class GraphDatabaseDependencies implements InternalAbstractGraphDatabase.Dependencies, GraphDatabaseFacadeFactory.Dependencies
 {
+    public static GraphDatabaseDependencies newDependencies(GraphDatabaseFacadeFactory.Dependencies deps)
+    {
+        return new GraphDatabaseDependencies( deps.monitors(), deps.logging(), Iterables.toList(deps.settingsClasses
+                () ), Iterables.toList(deps.kernelExtensions() ), Iterables.toList(deps.executionEngines() ) );
+    }
+
     public static GraphDatabaseDependencies newDependencies()
     {
         List<KernelExtensionFactory<?>> kernelExtensions = new ArrayList<>();

@@ -20,8 +20,8 @@
 package org.neo4j.server.database;
 
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
+import org.neo4j.kernel.impl.factory.CommunityFacadeFactory;
 import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.lifecycle.LifecycleAdapter;
 import org.neo4j.kernel.logging.Logging;
@@ -35,7 +35,7 @@ public class WrappedDatabase extends LifecycleAdapter implements Database
         return new Factory()
         {
             @Override
-            public Database newDatabase(Config config, InternalAbstractGraphDatabase.Dependencies dependencies)
+            public Database newDatabase(Config config, CommunityFacadeFactory.Dependencies dependencies)
             {
                 return new WrappedDatabase( db );
             }

@@ -33,7 +33,7 @@
     </encoder>
   </appender>
 
-  <logger name="org.neo4j.kernel.InternalAbstractGraphDatabase" level="WARN">
+  <logger name="org.neo4j.kernel.impl.factory.GraphDatabaseFacade" level="WARN">
   </logger>
 
   <logger name="org.neo4j" level="INFO" additivity="false">

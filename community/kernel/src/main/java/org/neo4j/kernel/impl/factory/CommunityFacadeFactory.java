@@ -17,26 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.kernel;
+package org.neo4j.kernel.impl.factory;
 
-import org.neo4j.io.fs.FileSystemAbstraction;
-import org.neo4j.kernel.impl.transaction.RecoveryVerifier;
+import java.util.Map;
 
-@Deprecated
-public class CommonFactories
+public class CommunityFacadeFactory
+    extends GraphDatabaseFacadeFactory
 {
-    public static IdGeneratorFactory defaultIdGeneratorFactory()
+    @Override
+    public GraphDatabaseFacade newFacade( Map<String, String> params, Dependencies dependencies, GraphDatabaseFacade
+            graphDatabaseFacade )
     {
-        return new DefaultIdGeneratorFactory();
+        params.put( Configuration.editionName.name(), "Community");
+
+        return super.newFacade( params, dependencies, graphDatabaseFacade );
     }
 
-    public static FileSystemAbstraction defaultFileSystemAbstraction()
+    protected EditionModule createEdition(PlatformModule platformModule)
     {
-        return new DefaultFileSystemAbstraction();
-    }
-
-    public static RecoveryVerifier defaultRecoveryVerifier()
-    {
-        return RecoveryVerifier.ALWAYS_VALID;
+        return new CommunityEditionModule( platformModule );
     }
 }

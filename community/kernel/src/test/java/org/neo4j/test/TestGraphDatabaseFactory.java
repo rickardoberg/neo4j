@@ -25,8 +25,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.kernel.extension.KernelExtensionFactory;
 import org.neo4j.io.fs.FileSystemAbstraction;
+import org.neo4j.kernel.GraphDatabaseDependencies;
+import org.neo4j.kernel.extension.KernelExtensionFactory;
 import org.neo4j.kernel.logging.Logging;
 import org.neo4j.kernel.monitoring.Monitors;
 
@@ -142,7 +143,7 @@ public class TestGraphDatabaseFactory extends GraphDatabaseFactory
             @SuppressWarnings("deprecation")
             public GraphDatabaseService newDatabase( Map<String, String> config )
             {
-                return new ImpermanentGraphDatabase( storeDir, config, state.databaseDependencies() )
+                return new ImpermanentGraphDatabase( storeDir, config, GraphDatabaseDependencies.newDependencies(state.databaseDependencies()))
                 {
                     @Override
                     protected FileSystemAbstraction createFileSystemAbstraction()

@@ -29,8 +29,8 @@ import org.neo4j.graphdb.config.Setting;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.harness.ServerControls;
 import org.neo4j.harness.TestServerBuilder;
+import org.neo4j.kernel.impl.factory.CommunityFacadeFactory;
 import org.neo4j.kernel.GraphDatabaseDependencies;
-import org.neo4j.kernel.InternalAbstractGraphDatabase.Dependencies;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.logging.ClassicLoggingService;
 import org.neo4j.kernel.logging.Logging;
@@ -66,7 +66,7 @@ public class InProcessServerBuilder implements TestServerBuilder
     @Override
     public ServerControls newServer()
     {
-        Dependencies dependencies = GraphDatabaseDependencies.newDependencies().logging( logging );
+        CommunityFacadeFactory.Dependencies dependencies = GraphDatabaseDependencies.newDependencies().logging( logging );
         InProcessServerControls controls = new InProcessServerControls( serverFolder,
                 new CommunityNeoServer( new MapConfigurator( config, extensions.toList() ), dependencies ), logging );
         controls.start();

@@ -19,9 +19,6 @@
  */
 package org.neo4j.graphdb;
 
-import org.junit.Rule;
-import org.junit.Test;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,9 +26,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Rule;
+import org.junit.Test;
+
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.helpers.Function;
 import org.neo4j.io.fs.FileSystemAbstraction;
+import org.neo4j.kernel.GraphDatabaseDependencies;
 import org.neo4j.kernel.IdGeneratorFactory;
 import org.neo4j.kernel.IdType;
 import org.neo4j.kernel.impl.store.UnderlyingStorageException;
@@ -49,6 +50,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+
 import static org.neo4j.graphdb.DynamicLabel.label;
 import static org.neo4j.graphdb.Neo4jMatchers.hasLabel;
 import static org.neo4j.graphdb.Neo4jMatchers.hasLabels;
@@ -672,7 +674,7 @@ public class LabelsAcceptanceTest
                     @Override
                     public GraphDatabaseService newDatabase( Map<String,String> config )
                     {
-                        return new ImpermanentGraphDatabase( storeDir, config, state.databaseDependencies() )
+                        return new ImpermanentGraphDatabase( storeDir, config, GraphDatabaseDependencies.newDependencies(state.databaseDependencies() ))
                         {
                             @Override
                             protected IdGeneratorFactory createIdGeneratorFactory()

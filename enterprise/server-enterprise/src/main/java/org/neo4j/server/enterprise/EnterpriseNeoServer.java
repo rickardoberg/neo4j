@@ -23,8 +23,10 @@ import java.util.Map;
 
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.InternalAbstractGraphDatabase.Dependencies;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory.Dependencies;
 import org.neo4j.kernel.configuration.Config;
+import org.neo4j.kernel.ha.factory.EnterpriseFacadeFactory;
 import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
 import org.neo4j.kernel.impl.storemigration.StoreUpgrader;
 import org.neo4j.kernel.logging.Logging;
@@ -38,8 +40,8 @@ import org.neo4j.server.preflight.EnsurePreparedForHttpLogging;
 import org.neo4j.server.preflight.PerformRecoveryIfNecessary;
 import org.neo4j.server.preflight.PerformUpgradeIfNecessary;
 import org.neo4j.server.preflight.PreFlightTasks;
-import org.neo4j.server.web.ServerInternalSettings;
 import org.neo4j.server.rest.management.AdvertisableService;
+import org.neo4j.server.web.ServerInternalSettings;
 import org.neo4j.server.webadmin.rest.MasterInfoServerModule;
 import org.neo4j.server.webadmin.rest.MasterInfoService;
 
@@ -58,7 +60,9 @@ public class EnterpriseNeoServer extends AdvancedNeoServer
         @Override
         public GraphDatabaseAPI newGraphDatabase( String storeDir, Map<String,String> params, Dependencies dependencies )
         {
-            return new HighlyAvailableGraphDatabase( storeDir, params, dependencies );
+            params.put( GraphDatabaseFacadeFactory.Configuration.store_dir.name(), storeDir );
+
+            return new EnterpriseFacadeFactory().newFacade( params, dependencies );
         }
     };
 

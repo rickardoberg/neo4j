@@ -32,11 +32,13 @@ import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.extension.KernelExtensions;
 import org.neo4j.kernel.impl.store.StoreFactory;
 import org.neo4j.kernel.impl.storemigration.monitoring.VisibleMigrationProgressMonitor;
+import org.neo4j.kernel.impl.util.Dependencies;
 import org.neo4j.kernel.lifecycle.LifeSupport;
 import org.neo4j.kernel.logging.Logging;
 import org.neo4j.kernel.logging.SystemOutLogging;
 
 import static java.lang.String.format;
+
 import static org.neo4j.kernel.extension.UnsatisfiedDependencyStrategies.ignore;
 import static org.neo4j.kernel.impl.pagecache.StandalonePageCacheFactory.createPageCache;
 import static org.neo4j.kernel.impl.storemigration.StoreUpgrader.NO_MONITOR;
@@ -63,9 +65,11 @@ public class StoreMigrationTool
         LifeSupport life = new LifeSupport();
 
         // Add participants from kernel extensions...
+        Dependencies deps = new Dependencies();
+        deps.satisfyDependencies( fs, config );
         KernelExtensions kernelExtensions = life.add( new KernelExtensions(
                 GraphDatabaseDependencies.newDependencies().kernelExtensions(), config,
-                kernelExtensionDependencyResolver( fs, config ), ignore() ) );
+                deps, ignore() ) );
 
         // Add the kernel store migrator
         config = StoreFactory.configForStoreDir( config, new File( legacyStoreDirectory ) );

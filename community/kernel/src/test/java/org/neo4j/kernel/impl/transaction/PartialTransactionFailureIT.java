@@ -19,13 +19,13 @@
  */
 package org.neo4j.kernel.impl.transaction;
 
-import org.junit.Rule;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+
+import org.junit.Rule;
+import org.junit.Test;
 
 import org.neo4j.adversaries.ClassGuardedAdversary;
 import org.neo4j.adversaries.CountingAdversary;
@@ -37,6 +37,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactoryState;
 import org.neo4j.io.fs.FileSystemAbstraction;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.neo4j.kernel.GraphDatabaseDependencies;
 import org.neo4j.kernel.impl.api.index.inmemory.InMemoryIndexProviderFactory;
 import org.neo4j.kernel.impl.api.scan.InMemoryLabelScanStoreExtension;
 import org.neo4j.kernel.impl.transaction.log.LogRotation;
@@ -203,7 +204,7 @@ public class PartialTransactionFailureIT
             state.addKernelExtensions( Arrays.asList(
                     new InMemoryIndexProviderFactory(),
                     new InMemoryLabelScanStoreExtension() ) );
-            return state.databaseDependencies();
+            return GraphDatabaseDependencies.newDependencies(state.databaseDependencies());
         }
     }
 }

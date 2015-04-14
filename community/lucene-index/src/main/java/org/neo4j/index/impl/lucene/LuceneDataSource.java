@@ -19,6 +19,18 @@
  */
 package org.neo4j.index.impl.lucene;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.analysis.LowerCaseFilter;
@@ -41,6 +53,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
+
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterator;
@@ -51,25 +64,12 @@ import org.neo4j.helpers.UTF8;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.PrefetchingResourceIterator;
 import org.neo4j.io.fs.FileSystemAbstraction;
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
-import org.neo4j.kernel.NeoStoreDataSource;
+import org.neo4j.kernel.impl.factory.CommunityFacadeFactory;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.impl.cache.LruCache;
 import org.neo4j.kernel.impl.index.IndexConfigStore;
 import org.neo4j.kernel.impl.index.IndexEntityType;
 import org.neo4j.kernel.lifecycle.Lifecycle;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.neo4j.index.impl.lucene.MultipleBackupDeletionPolicy.SNAPSHOT_ID;
 import static org.neo4j.kernel.impl.store.NeoStore.versionStringToLong;
@@ -86,8 +86,8 @@ public class LuceneDataSource implements Lifecycle
     {
         public static final Setting<Integer> lucene_searcher_cache_size = GraphDatabaseSettings.lucene_searcher_cache_size;
         public static final Setting<Boolean> allow_store_upgrade = GraphDatabaseSettings.allow_store_upgrade;
-        public static final Setting<Boolean> ephemeral = InternalAbstractGraphDatabase.Configuration.ephemeral;
-        public static final Setting<File> store_dir = NeoStoreDataSource.Configuration.store_dir;
+        public static final Setting<Boolean> ephemeral = CommunityFacadeFactory.Configuration.ephemeral;
+        public static final Setting<File> store_dir = GraphDatabaseSettings.store_dir;
     }
 
     public static final Version LUCENE_VERSION = Version.LUCENE_36;
